@@ -77,25 +77,25 @@ JmhBenchmark.moshi_reflective_string_toJson                false  thrpt   25  15
 }
 
 private fun printResults(type: ResultType, results: List<Analysis>) {
-  val groupedResults = type.groupings.associate { grouping ->
-    grouping to results.filter {
-      grouping.matchFunction(it.benchmark)
-    }
+  val groupedResults = type.groupings.associateWith { grouping ->
+      results.filter {
+          grouping.matchFunction(it.benchmark)
   }
-  val benchmarkLength = results.maxBy { it.benchmark.length }!!.benchmark.length
-  val scoreLength = results.maxBy { it.score.toString().length }!!.score.toString().length
-  val errorLength = results.maxBy { it.error.toString().length }!!.error.toString().length
+  }
+  val benchmarkLength = results.maxByOrNull { it.benchmark.length }!!.benchmark.length
+  val scoreLength = results.maxByOrNull { it.score.toString().length }!!.score.toString().length
+  val errorLength = results.maxByOrNull { it.error.toString().length }!!.error.toString().length
 
   check(groupedResults.values.flatten().size == results.size) {
     "Missing information!"
   }
 
   val output = buildString {
-    appendln()
+    appendLine()
     append(type.description)
-    appendln(':')
-    appendln()
-    appendln("```")
+    appendLine(':')
+    appendLine()
+    appendLine("```")
     groupedResults.entries
         .joinTo(this, "\n\n", postfix = "\n```") { (grouping, matchedAnalyses) ->
           val content = matchedAnalyses.sortedByDescending { it.score }
